@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<!--
+  This app is proof that
+  anyone is capable of 
+  writing untidy code
+
+  DO NOT BE AFRAID :)
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+
+  <style>
+    #canvas {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    #status {
+      font-family: 'Permanent Marker', cursive;
+      font-size: 32px;
+      text-align: center;
+    }
+  </style>
+
+</head>
+<body>
+
+  <canvas id="canvas" width="800" height="600"></canvas>
+  <h4 id="status">X's Turn</h4>
+
+  <script 
+    src="https://cdnjs.cloudflare.com/ajax/libs/rough.js/3.1.0/rough.js" 
+    integrity="sha512-uBOveTyeyZeNHM6M/x8BxnMBZ0cFeYctySKL0oG/dG3xw0kX606+pzKaIX2p9ZxetQIDD2ieqAZPS2wITZ+jRw==" 
+    crossorigin="anonymous"></script>
+  <script>
+    const X = 'X'
+    const Z = '0'
+    const board = [
+      [null, null, null],
+      [null, null, null],
+      [null, null, null]
+    ]
+    let currentTurn = X
+    let gameOver = false
+
+    const boardPadding = 10
+    const dimensions = {
+      width: 780,
+      height: 579
+    }
+    const tileDimensions = {
+      width: dimensions.width / 3,
+      height: dimensions.height / 3
+    }
+
+    function getTileRect(row, col)
+    {
+      return {
+        x: boardPadding + tileDimensions.width * row,
+        y: boardPadding + tileDimensions.height * col,
+        width: tileDimensions.width,
+        height: tileDimensions.height
+      }
+    }
+
+    
+    function getTile(canvas, evt) {
+      const rect = canvas.getBoundingClientRect()
+      const pos = {
+          x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
+          y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
+      }
+      if(pos.x < boardPadding || pos.x > dimensions.width - boardPadding) return null
+      if(pos.y < boardPadding || pos.y > dimensions.height - boardPadding) return null
+      for(let row = 0; row < 3; row ++)
+      {
+        for(let col = 0; col < 3; col ++)
+        {
+          var tile = getTileRect(row, col)
+          if(pos.x > tile.x && pos.x < tile.width * (row + 1) + boardPadding && pos.y > tile.y && pos.y < tile.height * (col + 1) + boardPadding) return {row, col}
+        }
+      }
+      return null
+    }
+
+    function clearBoard()
+    {
+      for(let i = 0; i < 3; i++)
+        for(let j = 0; j < 3; j++)
+          board[i][j] = null
+      currentTurn = X
+    }
+
+    function isGameOver()
+    {
+      for(let i = 0; i < 3; i++)
+      {
+        
+        if(board[i][0] !== null && board[i][0] == board[i][1] && board[i][0] == board[i][2]) return board[i][0];
+        if(board[0][i] !== null && board[0][i] == board[1][i] && board[i][0] == board[2][i]) return board[0][i];
+      }
+      return false
+    }
+
+    const statusText = document.getElementById('status')
+    const canvas = document.getElementById('canvas')
+    const rc = rough.canvas(canvas)
+    const context = canvas.getContext('2d')
+
+    function drawBoard()
+    {
+      const fontSize = 72
+      context.font = fontSize + 'px Permanent Marker';
+      context.clearRect(0, 0, canvas.width, canvas.height)
+      const tileStyle = {
+        stroke: '#00000077',
+        fill: '#8A87FF55',
+  
+        fillStyle: 'zigzag',
+        fillWeight: 8,
+        hachureGap: 16,
+  
+        roughness: 2.5,
+        strokeWidth: 6
+      }
+  
+      for(let row = 0; row < 3; row++)
+      {
+        for(let col = 0; col < 3; col++)
+        {
+          const rect = getTileRect(row, col)
+          switch(board[row][col])
+          {
+            case null: {
+                const style = Object.assign({}, tileStyle)
+                style.fill = '#FF000055'
+                drawRect(rect, style)
+              }
+              break;
+            case X: {
+                drawX(rect)
+              }
+              break;
+            case Z: {
+                drawY(rect)
+              }
+              break;
+          }
+          
+        }
+      }  
+
+      function drawRect(rect, style)
+      {
+        rc.rectangle(rect.x, rect.y, rect.width, rect.height, style)
+      }
+
+      function drawChar(char, rect)
+      {
+        
+        context.fillText(char, rect.x + rect.width/2 - fontSize/2, rect.y + rect.height/2 + fontSize/4);
+      }
+
+      function drawX(rect)
+      {
+        const style = Object.assign({}, tileStyle)
+        style.fill = '#00FF0055'
+        drawRect(rect, style)
+        drawChar('X', rect)
+      }
+
+      function drawY(rect)
+      {
+        const style = Object.assign({}, tileStyle)
+        style.fill = '#0000FF55'
+        drawRect(rect, style)
+        drawChar('0', rect)
+      }
+    }
+
+    window.addEventListener('mouseup', e => {
+      if(gameOver) return
+      const result = isGameOver()
+      if(result !== false) gameOver = true
+
+      const tile = getTile(canvas, e)
+      if(tile !== null)
+      {
+        if(board[tile.row][tile.col] !== null) return // we only touch the tile if it wasn't already touched
+
+        board[tile.row][tile.col] = currentTurn
+        drawBoard()
+
+        if(currentTurn === X) currentTurn = Z 
+        else currentTurn = X
+
+        if(gameOver) {
+          statusText.textContent = `Game Over! ${result} wins!`
+        }
+        else
+        {
+           statusText.textContent = currentTurn + "'s turn"
+        }
+      }
+    });
+
+    drawBoard()
+    
+    
+    
+  </script>
+</body>
+</html>
