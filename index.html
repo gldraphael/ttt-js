@@ -188,8 +188,6 @@
 
     window.addEventListener('mouseup', e => {
       if(gameOver) return
-      const result = isGameOver()
-      if(result !== false) gameOver = true
 
       const tile = getTile(canvas, e)
       if(tile !== null)
@@ -199,14 +197,17 @@
         board[tile.row][tile.col] = currentTurn
         drawBoard()
 
-        if(currentTurn === X) currentTurn = Z 
-        else currentTurn = X
+        const result = isGameOver()
+        if(result !== false) gameOver = true
 
         if(gameOver) {
           statusText.textContent = `Game Over! ${result} wins!`
         }
         else
         {
+          if(currentTurn === X) currentTurn = Z 
+          else currentTurn = X
+          
            statusText.textContent = currentTurn + "'s turn"
         }
       }
