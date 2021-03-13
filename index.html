@@ -34,7 +34,7 @@
 <body>
 
   <canvas id="canvas" width="800" height="600"></canvas>
-  <h4 id="status">X's Turn</h4>
+  <h4 id="status">X: Your turn</h4>
 
   <script 
     src="https://cdnjs.cloudflare.com/ajax/libs/rough.js/3.1.0/rough.js" 
@@ -191,7 +191,7 @@
         if(result !== false) gameOver = true
 
         if(result) {
-          if(result === true) statusText.textContent = "Game Over!"
+          if(result === true) statusText.textContent = "Draw!"
           else {
             if(result === X) statusText.textContent = `You win!`
             if(result === Z) statusText.textContent = `The fake-AI wins!`
@@ -210,16 +210,74 @@
         }
     }
 
+    function makeAiMoveAt(i, j) {
+      board[i][j] = Z
+      drawBoard()
+      moveCheck()
+      isAiMovePending = false
+    }
+
+    const possibleWins = [
+      [{row:0, col:0}, {row:0, col:1}, {row:0, col:2}],
+      [{row:1, col:0}, {row:1, col:1}, {row:1, col:2}],
+      [{row:2, col:0}, {row:2, col:1}, {row:2, col:2}],
+
+      [{row:0, col:0}, {row:1, col:0}, {row:2, col:0}],
+      [{row:0, col:1}, {row:1, col:1}, {row:2, col:1}],
+      [{row:0, col:2}, {row:1, col:2}, {row:2, col:2}],
+
+      [{row:0, col:0}, {row:1, col:1}, {row:2, col:2}],
+      [{row:2, col:0}, {row:1, col:1}, {row:0, col:2}],
+    ]
+
+    function getAiMissingMove(move) {  
+      for(list of possibleWins) {
+        if(list.filter(i => board[i.row][i.col] == move).length == 2) {
+          for(i of list) {
+            if(board[i.row][i.col] === null) return i
+          }
+        }
+      }
+      return null
+    }
+
     function makeAiMove() {
       isAiMovePending = true
-      for(let i = 0; i < 3; i++) {
-        for(let j = 0; j < 3; j++) {
-          if(board[i][j] === null) {
-            board[i][j] = Z
-            drawBoard()
-            moveCheck()
-            isAiMovePending = false
-            return
+      
+      // take the middle tile if it's empty
+      if(board[1][1] === null) {
+        makeAiMoveAt(1, 1)
+        return
+      }
+
+      // make a winning move if possible
+      const winningMove = getAiMissingMove(Z)
+      if(winningMove !== null) {
+        makeAiMoveAt(winningMove.row, winningMove.col)
+        return
+      }
+
+      // defend if needed
+      const defendingMove = getAiMissingMove(X)
+      if(defendingMove !== null) {
+        makeAiMoveAt(defendingMove.row, defendingMove.col)
+        return
+      }
+
+      // take a corner tile if its empty
+      else if(board[0][0] === null) makeAiMoveAt(0,0)
+      else if(board[0][2] === null) makeAiMoveAt(0,2)
+      else if(board[2][2] === null) makeAiMoveAt(2,2)
+      else if(board[2][0] === null) makeAiMoveAt(2,0)
+      
+      // take whatever's left
+      else { 
+        for(let i = 0; i < 3; i++) {
+          for(let j = 0; j < 3; j++) {
+            if(board[i][j] === null) {
+              makeAiMoveAt(i, j)
+              return
+            }
           }
         }
       }
