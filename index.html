@@ -50,6 +50,7 @@
     ]
     let currentTurn = X
     let gameOver = false
+    let isAiMovePending = false
 
     const statusText = document.getElementById('status')
 
@@ -185,31 +186,63 @@
       }
     }
 
+    function moveCheck() {
+      const result = isGameOver()
+        if(result !== false) gameOver = true
+
+        if(result) {
+          if(result === true) statusText.textContent = "Game Over!"
+          else {
+            if(result === X) statusText.textContent = `You win!`
+            if(result === Z) statusText.textContent = `The fake-AI wins!`
+          }
+        }
+        else {
+          if(currentTurn === X) {
+            currentTurn = Z 
+            statusText.textContent = currentTurn + ": AI's turn"
+            makeAiMove()
+          }
+          else {
+            currentTurn = X
+            statusText.textContent = currentTurn + ": Your turn"
+          }
+        }
+    }
+
+    function makeAiMove() {
+      isAiMovePending = true
+      for(let i = 0; i < 3; i++) {
+        for(let j = 0; j < 3; j++) {
+          if(board[i][j] === null) {
+            board[i][j] = Z
+            drawBoard()
+            moveCheck()
+            isAiMovePending = false
+            return
+          }
+        }
+      }
+    }
+
+    
+
     window.addEventListener('mouseup', e => {
       if(gameOver) return
+      if(isAiMovePending) return
 
       const tile = getTile(canvas, e)
       if(tile !== null) {
         if(board[tile.row][tile.col] !== null) return // we only touch the tile if it wasn't already touched
 
         board[tile.row][tile.col] = currentTurn
+
         drawBoard()
-
-        const result = isGameOver()
-        if(result !== false) gameOver = true
-
-        if(result) {
-          if(result === true) statusText.textContent = "Game Over!"
-          else statusText.textContent = `Game Over! ${result} wins!`
-        }
-        else {
-          if(currentTurn === X) currentTurn = Z 
-          else currentTurn = X
-
-           statusText.textContent = currentTurn + "'s turn"
-        }
+        moveCheck()
       }
     });
+
+    
 
     drawBoard()
     
