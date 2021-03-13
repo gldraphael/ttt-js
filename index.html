@@ -51,10 +51,12 @@
     let currentTurn = X
     let gameOver = false
 
+    const statusText = document.getElementById('status')
+
     const boardPadding = 10
     const dimensions = {
-      width: Math.min(780, window.innerWidth),
-      height: Math.min(780, window.innerWidth) * 0.75
+      width: Math.min(780, statusText.clientWidth),
+      height: Math.min(780, statusText.clientWidth) * 0.75
     }
     const tileDimensions = {
       width: dimensions.width / 3,
@@ -110,10 +112,9 @@
       return false
     }
 
-    const statusText = document.getElementById('status')
     const canvas = document.getElementById('canvas')
-    canvas.width = dimensions.width + 20
-    canvas.height = dimensions.height + 20
+    canvas.width = dimensions.width + boardPadding * 2
+    canvas.height = dimensions.height + boardPadding * 2
     const rc = rough.canvas(canvas)
     const context = canvas.getContext('2d')
 
