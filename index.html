@@ -63,8 +63,7 @@
       height: dimensions.height / 3
     }
 
-    function getTileRect(row, col)
-    {
+    function getTileRect(row, col) {
       return {
         x: boardPadding + tileDimensions.width * row,
         y: boardPadding + tileDimensions.height * col,
@@ -82,10 +81,8 @@
       }
       if(pos.x < boardPadding || pos.x > dimensions.width - boardPadding) return null
       if(pos.y < boardPadding || pos.y > dimensions.height - boardPadding) return null
-      for(let row = 0; row < 3; row ++)
-      {
-        for(let col = 0; col < 3; col ++)
-        {
+      for(let row = 0; row < 3; row ++) {
+        for(let col = 0; col < 3; col ++) {
           var tile = getTileRect(row, col)
           if(pos.x > tile.x && pos.x < tile.width * (row + 1) + boardPadding && pos.y > tile.y && pos.y < tile.height * (col + 1) + boardPadding) return {row, col}
         }
@@ -93,22 +90,30 @@
       return null
     }
 
-    function clearBoard()
-    {
+    function clearBoard() {
       for(let i = 0; i < 3; i++)
         for(let j = 0; j < 3; j++)
           board[i][j] = null
       currentTurn = X
     }
 
-    function isGameOver()
-    {
-      for(let i = 0; i < 3; i++)
-      {
+    function isGameOver() {
+      let nullFound = false
+      for(let i = 0; i < 3; i++) {
+
         if(board[i][0] !== null && board[i][0] == board[i][1] && board[i][0] == board[i][2]) return board[i][0];
         if(board[0][i] !== null && board[0][i] == board[1][i] && board[0][i] == board[2][i]) return board[0][i];
+
+        if(nullFound === false) {
+          for(let j = 0; j < 3; j++)
+            if(board[i][j] === null) {
+              nullFound = true
+              break
+            }
+        }
       }
       if(board[0][0] !== null && board[0][0] == board[1][1] && board[0][0] == board[2][2]) return board[0][0];
+      if(nullFound === false) return true
       return false
     }
 
@@ -118,8 +123,7 @@
     const rc = rough.canvas(canvas)
     const context = canvas.getContext('2d')
 
-    function drawBoard()
-    {
+    function drawBoard() {
       const fontSize = 72
       context.font = fontSize + 'px Permanent Marker';
       context.clearRect(0, 0, canvas.width, canvas.height)
@@ -135,13 +139,10 @@
         strokeWidth: 6
       }
   
-      for(let row = 0; row < 3; row++)
-      {
-        for(let col = 0; col < 3; col++)
-        {
+      for(let row = 0; row < 3; row++) {
+        for(let col = 0; col < 3; col++) {
           const rect = getTileRect(row, col)
-          switch(board[row][col])
-          {
+          switch(board[row][col]) {
             case null: {
                 const style = Object.assign({}, tileStyle)
                 style.fill = '#FF000055'
@@ -157,31 +158,25 @@
               }
               break;
           }
-          
         }
       }  
 
-      function drawRect(rect, style)
-      {
+      function drawRect(rect, style) {
         rc.rectangle(rect.x, rect.y, rect.width, rect.height, style)
       }
 
-      function drawChar(char, rect)
-      {
-        
+      function drawChar(char, rect) {
         context.fillText(char, rect.x + rect.width/2 - fontSize/2, rect.y + rect.height/2 + fontSize/4);
       }
 
-      function drawX(rect)
-      {
+      function drawX(rect) {
         const style = Object.assign({}, tileStyle)
         style.fill = '#00FF0055'
         drawRect(rect, style)
         drawChar('X', rect)
       }
 
-      function drawY(rect)
-      {
+      function drawY(rect) {
         const style = Object.assign({}, tileStyle)
         style.fill = '#0000FF55'
         drawRect(rect, style)
@@ -193,8 +188,7 @@
       if(gameOver) return
 
       const tile = getTile(canvas, e)
-      if(tile !== null)
-      {
+      if(tile !== null) {
         if(board[tile.row][tile.col] !== null) return // we only touch the tile if it wasn't already touched
 
         board[tile.row][tile.col] = currentTurn
@@ -206,8 +200,7 @@
         if(gameOver) {
           statusText.textContent = `Game Over! ${result} wins!`
         }
-        else
-        {
+        else {
           if(currentTurn === X) currentTurn = Z 
           else currentTurn = X
 
