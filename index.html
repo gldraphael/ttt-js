@@ -53,8 +53,8 @@
 
     const boardPadding = 10
     const dimensions = {
-      width: 780,
-      height: 579
+      width: Math.min(780, window.innerWidth),
+      height: Math.min(780, window.innerWidth) * 0.75
     }
     const tileDimensions = {
       width: dimensions.width / 3,
@@ -112,6 +112,8 @@
 
     const statusText = document.getElementById('status')
     const canvas = document.getElementById('canvas')
+    canvas.width = dimensions.width + 20
+    canvas.height = dimensions.height + 20
     const rc = rough.canvas(canvas)
     const context = canvas.getContext('2d')
 
@@ -207,7 +209,7 @@
         {
           if(currentTurn === X) currentTurn = Z 
           else currentTurn = X
-          
+
            statusText.textContent = currentTurn + "'s turn"
         }
       }
