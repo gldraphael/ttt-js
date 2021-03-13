@@ -264,6 +264,10 @@
         return
       }
 
+      // pick an edge if X is trying to triangulate
+      else if(board[0][0] === X && board[2][2] === X && board[0][1] === null) makeAiMoveAt(0, 1)
+      else if(board[0][2] === X && board[2][0] === X && board[0][1] === null) makeAiMoveAt(0, 1)
+
       // take a corner tile if its empty
       else if(board[0][0] === null) makeAiMoveAt(0,0)
       else if(board[0][2] === null) makeAiMoveAt(0,2)
