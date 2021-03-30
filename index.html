@@ -5,6 +5,8 @@
   writing untidy code
 
   DO NOT BE AFRAID :)
+
+  Source Code at: https://github.com/gldraphael/ttt-js
 -->
 <html lang="en">
 <head>
@@ -17,16 +19,38 @@
   <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
 
   <style>
+    html {
+      font-family: 'Permanent Marker', cursive;
+      font-size: 32px;
+      text-align: center;
+      color: darkslategray;
+    }
+    body {
+      background-color: rgb(247, 247, 232);
+    }
     #canvas {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -60%);
     }
-    #status {
-      font-family: 'Permanent Marker', cursive;
-      font-size: 32px;
-      text-align: center;
+    .muted {
+      color: gray
+    }
+    .bottom{
+      position: absolute;
+      bottom: 0;
+      margin-left: auto;
+      margin-right: auto;
+      left: 0;
+      right: 0;
+      color: darkslategrey
+    }
+    .bottom p {
+      font-size: 24px
+    }
+    .bottom p.small {
+      font-size: 18px
     }
   </style>
 
@@ -35,6 +59,10 @@
 
   <canvas id="canvas" width="800" height="600"></canvas>
   <h4 id="status">X: Your turn</h4>
+  <div class="bottom">
+    <p>Reload page to restart</p>
+    <p class="muted small">Also, the game IS winnable.<br /> This "AI" is not *that* smart<br />:D</p>
+  </div>
 
   <script 
     src="https://cdnjs.cloudflare.com/ajax/libs/rough.js/3.1.0/rough.js" 
